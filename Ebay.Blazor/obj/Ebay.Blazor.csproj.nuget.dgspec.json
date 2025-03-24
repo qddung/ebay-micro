@@ -51,6 +51,20 @@
       "frameworks": {
         "net7.0": {
           "targetAlias": "net7.0",
+          "dependencies": {
+            "Blazorise.Bootstrap5": {
+              "target": "Package",
+              "version": "[1.7.5, )"
+            },
+            "Blazorise.Icons.FontAwesome": {
+              "target": "Package",
+              "version": "[1.7.5, )"
+            },
+            "Blazorise.Material": {
+              "target": "Package",
+              "version": "[1.7.5, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

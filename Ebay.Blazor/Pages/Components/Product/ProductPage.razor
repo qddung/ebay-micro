@@ -1,0 +1,79 @@
+@page "/products"
+@namespace Ebay.Blazor.Pages.Components
+@using Blazorise
+@using Blazorise.Bootstrap
+@using Blazorise.Icons
+
+<Container>
+    <Row>
+        <Column Size="9">
+            <TextEdit Placeholder="Search for anything..." Style="width:100%" />
+        </Column>
+        <Column Size="3">
+            <Select TValue="string" Placeholder="All Categories" Style="width:100%">
+                @foreach (var category in categories)
+                {
+                    <SelectItem Value="@category">@category</SelectItem>
+                }
+            </Select>
+        </Column>
+    </Row>
+    <Row Class="mt-3">
+        <Column Size="9">
+            <Select TValue="string" Placeholder="Best Match" Style="width:150px">
+                @foreach (var option in sortOptions)
+                {
+                    <SelectItem Value="@option">@option</SelectItem>
+                }
+            </Select>
+        </Column>
+        <Column Size="3" Class="text-right">
+            <Button Color="Color.Primary">
+                <Blazorise.Icons.FontAwesome.Icon Name="Blazorise.Icons.FontAwesome.FontAwesomeIcons.List" />
+            </Button>
+            <Button Color="Color.Secondary" Class="ml-2">
+                <Blazorise.Icons.FontAwesome.Icon Name="Blazorise.Icons.FontAwesome.FontAwesomeIcons.ThumbsDown" />
+            </Button>
+        </Column>
+    </Row>
+    <Row Class="mt-4">
+        @foreach (var product in products)
+        {
+            <Column Size="6">
+                <Card>
+                    <CardBody>
+                        <Row>
+                            <Column Size="4">
+                                <Image Src="@product.ImageUrl" Alt="Product Image" Fluid />
+                            </Column>
+                            <Column Size="8">
+                                <h5>@product.Title</h5>
+                                <p><strong>@product.Price.ToString("N0") VND</strong></p>
+                                <p>@product.WatchCount watching</p>
+                            </Column>
+                        </Row>
+                    </CardBody>
+                </Card>
+            </Column>
+        }
+    </Row>
+</Container>
+
+@code {
+    private List<string> categories = new() { "All Categories", "Watches", "Electronics", "Fashion" };
+    private List<string> sortOptions = new() { "Best Match", "Price: Low to High", "Price: High to Low" };
+
+    private List<Product> products = new()
+{
+new Product { Title = "Luxury Cadillac Model Car", Price = 1020224, WatchCount = 129, ImageUrl = "car.jpg" },
+new Product { Title = "Nicolet 1886 Automatic Watch", Price = 10077240, WatchCount = 177, ImageUrl = "watch.jpg" }
+};
+
+    public class Product
+    {
+        public string Title { get; set; }
+        public int Price { get; set; }
+        public int WatchCount { get; set; }
+        public string ImageUrl { get; set; }
+    }
+}
