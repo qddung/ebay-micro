@@ -1,8 +1,7 @@
-
 using System.Text;
 using System.Text.Json;
 
-namespace Ebay.Blazor.StateData
+namespace Ebay.Blazor.Data.BasePage
 {
     public class BasePageState
     {
@@ -20,7 +19,7 @@ namespace Ebay.Blazor.StateData
         public async Task<TResult> PostRequest<TResult, TModelRequest>(string url, TModelRequest model)
         {
             // using StringContent jsonContent = new(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
-            var res = await _httpClient.PostAsJsonAsync<TModelRequest>(url, model);
+            var res = await _httpClient.PostAsJsonAsync(url, model);
             var response = await res.Content.ReadFromJsonAsync<TResult>();
             return response;
         }
@@ -42,7 +41,7 @@ namespace Ebay.Blazor.StateData
             {
                 var res = await _httpClient.SendAsync(request);
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 return "Thất bại";
             }
@@ -56,7 +55,7 @@ namespace Ebay.Blazor.StateData
                 var res = await _httpClient.PutAsJsonAsync(url, requestModel);
                 var response = await res.Content.ReadFromJsonAsync<TResult>();
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 return "Thất bại";
             }

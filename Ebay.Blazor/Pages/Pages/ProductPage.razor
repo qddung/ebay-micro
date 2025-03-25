@@ -1,22 +1,12 @@
-@page "/products"
-@namespace Ebay.Blazor.Pages.Components
+@page "/"
+@namespace Ebay.Blazor.Pages.Pages
 @using Blazorise
 @using Blazorise.Bootstrap
 @using Blazorise.Icons
 
 <Container>
     <Row>
-        <Column Size="9">
-            <TextEdit Placeholder="Search for anything..." Style="width:100%" />
-        </Column>
-        <Column Size="3">
-            <Select TValue="string" Placeholder="All Categories" Style="width:100%">
-                @foreach (var category in categories)
-                {
-                    <SelectItem Value="@category">@category</SelectItem>
-                }
-            </Select>
-        </Column>
+        <EbaySearchField />
     </Row>
     <Row Class="mt-3">
         <Column Size="9">

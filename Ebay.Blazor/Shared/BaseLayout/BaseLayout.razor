@@ -1,8 +1,11 @@
 @inherits LayoutComponentBase
+
 @namespace Ebay.Blazor.Shared.BaseLayout
-<PageTitle>Ebay.Blazor</PageTitle>
-@* @inject  *@
+<PageTitle>Page</PageTitle>
 <div class="page">
+    <div>
+        <EbayMenu />
+    </div>
     <main>
         @Body
     </main>

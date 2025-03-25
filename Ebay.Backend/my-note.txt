@@ -1,0 +1,11 @@
+dotnet ef dbcontext scaffold Name=ConnectionStrings:EbayDb --context-dir Entities/Context --output-dir Entities dotnet ef dbcontext scaffold Name=ConnectionStrings:EbayDb -o Entities Microsoft.EntityFrameworkCore.SqlServer
+
+dotnet-ef dbcontext scaffold Name=ConnectionStrings:EbayDb --context-dir Entities/Context --output-dir Entities dotnet ef dbcontext scaffold Name=ConnectionStrings:EbayDb -o Entities Microsoft.EntityFrameworkCore.SqlServer
+
+
+dotnet ef dbcontext scaffold Name=ConnectionStrings:EbayDb --context-dir Entities/Context --output-dir Entities Microsoft.EntityFrameworkCore.SqlServer
+
+
+dotnet ef dbcontext scaffold Name=ConnectionStrings:EbayDb -o Entities Microsoft.EntityFrameworkCore.SqlServer
+
+

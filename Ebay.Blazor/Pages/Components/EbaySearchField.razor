@@ -1,0 +1,28 @@
+@namespace Ebay.Blazor.Components
+
+<div class="container">
+    <div class="search-container">
+        <select class="category-select">
+            <option>All Categories</option>
+            <option>Electronics</option>
+            <option>Fashion</option>
+            <option>Home & Garden</option>
+        </select>
+
+        <input type="text" class="search-input" placeholder="Search for anything">
+
+        <button class="search-button">Search</button>
+    </div>
+</div>
+
+
+@code {
+    public string Query { get; set; } = "";
+    private string selectedCategory = "All Categories";
+    private List<string> categories = new() { "All Categories", "Electronics", "Fashion", "Home & Garden" };
+
+    private void SelectCategory(string category)
+    {
+        selectedCategory = category;
+    }
+}

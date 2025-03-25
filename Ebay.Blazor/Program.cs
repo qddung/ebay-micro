@@ -12,7 +12,11 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
-builder.Services.AddBlazorise().AddBootstrap5Providers().AddFontAwesomeIcons();
+builder.Services.AddBlazorise(options =>
+{
+    options.Immediate = true;
+})
+.AddBootstrap5Providers().AddFontAwesomeIcons();
 
 
 var app = builder.Build();
