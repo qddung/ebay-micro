@@ -5,7 +5,7 @@ using Ebay.Model.Models.Api;
 namespace Ebay.Backend.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class ProductionController : ControllerBase
     {
 
@@ -17,7 +17,7 @@ namespace Ebay.Backend.Controllers
         }
 
         [HttpPost(Name = "GetProductListWithCategory")]
-        public IEnumerable<ProductViewItem> GetProductWithCategory(RequestProductList request)
+        public ResponseHttpModel<List<ProductViewItem>> GetProductWithCategory(RequestProductList request)
         {
             var context = EbayContext;
             var categoryQuery = context.Categories.AsQueryable();
@@ -35,11 +35,10 @@ namespace Ebay.Backend.Controllers
                 select new
                 {
                     ProductImages = g.Select(i => i).ToList(),
-
                 }
             );
 
-            var result = new List<ProductViewItem>();
+            var result = new ResponseHttpModel<List<ProductViewItem>>();
             return result;
 
         }
