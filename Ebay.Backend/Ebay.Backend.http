@@ -1,4 +1,4 @@
-@Ebay.Backend_HostAddress = http://localhost:5056
+@Ebay.Backend_HostAddress = http://localhost:5089
 
 GET {{Ebay.Backend_HostAddress}}/weatherforecast/
 Accept: application/json

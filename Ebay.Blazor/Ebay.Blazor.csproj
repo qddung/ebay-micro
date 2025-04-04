@@ -15,8 +15,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="Blazorise.Bootstrap5" Version="1.7.5" />
+		<PackageReference Include="Blazorise.Components" Version="1.7.5" />
 		<PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.7.5" />
 		<PackageReference Include="Blazorise.Material" Version="1.7.5" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

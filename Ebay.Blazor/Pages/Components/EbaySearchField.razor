@@ -1,15 +1,17 @@
 @namespace Ebay.Blazor.Components
 
+@inject EbayProductState ebayProdService
 <div class="container">
     <div class="search-container">
-        <select class="category-select">
-            <option>All Categories</option>
-            <option>Electronics</option>
-            <option>Fashion</option>
-            <option>Home & Garden</option>
-        </select>
+        <Select @bind-SelectedValue="@ebayProdService.RequestModel.CategoryId" TValue="int?" Class="category-select">
+            @foreach (var o in ebayProdService.GetCategory())
+            {
+                <SelectItem Value=@o.Value>@o.Label</SelectItem>
+            }
+        </Select>
 
-        <input type="text" class="search-input" placeholder="Search for anything">
+        <input type="text" @bind="@ebayProdService.RequestModel.Keyword" class="search-input"
+            placeholder="Search for anything">
 
         <button class="search-button">Search</button>
     </div>
@@ -17,12 +19,13 @@
 
 
 @code {
-    public string Query { get; set; } = "";
-    private string selectedCategory = "All Categories";
-    private List<string> categories = new() { "All Categories", "Electronics", "Fashion", "Home & Garden" };
-
-    private void SelectCategory(string category)
+    public async Task SelectCategory(int? category)
     {
-        selectedCategory = category;
+        ebayProdService.RequestModel.CategoryId = category;
+        @* await InvokeAsync(() => StateHasChanged()); *@
+        await ebayProdService.GetData();
     }
+
+
+
 }

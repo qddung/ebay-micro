@@ -58,3 +58,9 @@
 .search-button:hover {
     background-color: #0056b3;
 }
+
+/* navigation menu */
+
+.navigation-menu {
+    align-items: center;
+}

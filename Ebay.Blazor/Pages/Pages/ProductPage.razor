@@ -4,42 +4,43 @@
 @using Blazorise.Bootstrap
 @using Blazorise.Icons
 
+@inject EbayProductState ebayProdService
+@inject INotificationService notiService
+
 <Container>
     <Row>
-        <EbaySearchField />
+        <Div Display="Display.Flex.Row.OnDesktop" Class="d-flex navigation-menu">
+            <EbayLogo width="117" height="48" />
+            <EbaySearchField />
+        </Div>
     </Row>
-    <Row Class="mt-3">
-        <Column Size="9">
-            <Select TValue="string" Placeholder="Best Match" Style="width:150px">
-                @foreach (var option in sortOptions)
-                {
-                    <SelectItem Value="@option">@option</SelectItem>
-                }
-            </Select>
-        </Column>
-        <Column Size="3" Class="text-right">
+    <Row Class="mt-3 d-flex" Flex="Flex.JustifyContent.End">
+        <Select TValue="string" Placeholder="Best Match" Style="width:150px">
+            @foreach (var option in sortOptions)
+            {
+                <SelectItem Value="@option">@option</SelectItem>
+            }
+        </Select>
+        <Div Width="Width.Auto">
             <Button Color="Color.Primary">
                 <Blazorise.Icons.FontAwesome.Icon Name="Blazorise.Icons.FontAwesome.FontAwesomeIcons.List" />
             </Button>
-            <Button Color="Color.Secondary" Class="ml-2">
-                <Blazorise.Icons.FontAwesome.Icon Name="Blazorise.Icons.FontAwesome.FontAwesomeIcons.ThumbsDown" />
-            </Button>
-        </Column>
+        </Div>
     </Row>
     <Row Class="mt-4">
-        @foreach (var product in products)
+        @foreach (var product in ebayProdService.GetProduct())
         {
             <Column Size="6">
                 <Card>
                     <CardBody>
                         <Row>
                             <Column Size="4">
-                                <Image Src="@product.ImageUrl" Alt="Product Image" Fluid />
+                                @* <Image Src="@product.ImageUrl" Alt="Product Image" Fluid /> *@
                             </Column>
                             <Column Size="8">
-                                <h5>@product.Title</h5>
+                                <h5>@product.ProductName</h5>
                                 <p><strong>@product.Price.ToString("N0") VND</strong></p>
-                                <p>@product.WatchCount watching</p>
+                                <p class="text-danger">@product.ViewCount watching</p>
                             </Column>
                         </Row>
                     </CardBody>
@@ -52,18 +53,9 @@
 @code {
     private List<string> categories = new() { "All Categories", "Watches", "Electronics", "Fashion" };
     private List<string> sortOptions = new() { "Best Match", "Price: Low to High", "Price: High to Low" };
-
-    private List<Product> products = new()
-{
-new Product { Title = "Luxury Cadillac Model Car", Price = 1020224, WatchCount = 129, ImageUrl = "car.jpg" },
-new Product { Title = "Nicolet 1886 Automatic Watch", Price = 10077240, WatchCount = 177, ImageUrl = "watch.jpg" }
-};
-
-    public class Product
+    protected override async Task OnInitializedAsync()
     {
-        public string Title { get; set; }
-        public int Price { get; set; }
-        public int WatchCount { get; set; }
-        public string ImageUrl { get; set; }
+        ebayProdService.OnChange += StateHasChanged;
+        await ebayProdService.GetData();
     }
 }

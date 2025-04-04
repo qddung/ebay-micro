@@ -60,6 +60,10 @@
               "target": "Package",
               "version": "[1.7.5, )"
             },
+            "Blazorise.Components": {
+              "target": "Package",
+              "version": "[1.7.5, )"
+            },
             "Blazorise.Icons.FontAwesome": {
               "target": "Package",
               "version": "[1.7.5, )"
@@ -67,6 +71,14 @@
             "Blazorise.Material": {
               "target": "Package",
               "version": "[1.7.5, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
+            },
+            "System.Configuration.ConfigurationManager": {
+              "target": "Package",
+              "version": "[9.0.0, )"
             }
           },
           "imports": [
