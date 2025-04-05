@@ -13,9 +13,9 @@
         </select>
 
         <input type="text" @bind="@ebayProdService.RequestModel.Keyword" class="search-input"
-            placeholder="Search for anything">
+               placeholder="Search for anything">
 
-        <button class="search-button">Search</button>
+        <button @onclick="@Search" class="search-button">Search</button>
     </div>
 </div>
 
@@ -39,6 +39,11 @@
     public void Dispose()
     {
         ebayProdService.OnChange -= StateHasChanged;
+    }
+
+    public void Search()
+    {
+        ebayProdService.GetData();
     }
 
 
