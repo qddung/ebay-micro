@@ -10,17 +10,16 @@ namespace Ebay.Backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ProductionController : ControllerBase
+    public class ProductController : ControllerBase
     {
 
         private readonly EBayDbContext EbayContext;
 
-        public ProductionController(EBayDbContext context)
+        public ProductController(EBayDbContext context)
         {
             EbayContext = context;
         }
 
-        // [HttpPost(Name = "GetProductWithRequestModel")]
         [HttpPost("GetProductWithRequestModel")]
         public async Task<ActionResult<PagingData<ProductViewItem>>> GetProductWithCategory(RequestProductList request)
         {

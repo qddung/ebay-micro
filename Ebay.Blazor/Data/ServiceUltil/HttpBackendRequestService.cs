@@ -143,13 +143,25 @@ namespace Ebay.Blazor.Data.ServiceUltil
 
         public async Task<Acknowledgement<TResult>> PostRequest<TResult, TModelRequest>(string url, TModelRequest model, Action<Acknowledgement<TResult>> callback = null)
         {
-            // var res = await _httpClient.PostAsJsonAsync(url, model);
-            // var response = await res.Content.ReadFromJsonAsync<TResult>();
-            // return response;
-
             ActionCallRestFullApi callapi = async (string api) =>
             {
-                JsonContent content = JsonContent.Create(model);
+                //JsonContent content = JsonContent.Create(model, null, new System.Text.Json.JsonSerializerOptions()
+                //{
+                //    PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+                //});
+
+                
+
+                using StringWriter requestWriter = new StringWriter();
+                var requestSerializer = GetSerialiser(null);
+                requestSerializer.Serialize(requestWriter, model);
+                var content = new StringContent(
+                               requestWriter.ToString(),
+                               Encoding.UTF8,
+                               "application/json"
+                           );
+                Console.WriteLine(requestWriter.ToString());
+
                 var result = await _httpClient.PostAsync(api, content);
                 return result;
             };
@@ -162,10 +174,10 @@ namespace Ebay.Blazor.Data.ServiceUltil
         {
 
             using StringWriter requestWriter = new StringWriter();
-            JsonSerializer requestSerializer = GetSerialiser(null);
+            var requestSerializer = GetSerialiser(null);
             requestSerializer.Serialize(requestWriter, requestModel);
             var jsonContent = new StringContent(
-               requestSerializer.ToString(),
+               requestWriter.ToString(),
                Encoding.UTF8,
                "application/json"
            );
@@ -175,18 +187,6 @@ namespace Ebay.Blazor.Data.ServiceUltil
                 RequestUri = new Uri(url),
                 Content = jsonContent
             };
-
-
-            //     try
-            //     {
-            //         var res = await _httpClient.SendAsync(request);
-            //     }
-            //     catch (Exception)
-            //     {
-            //         return "Thất bại";
-            //     }
-            //     return "Thành công";
-
 
             ActionCallRestFullApi callapi = async (string api) =>
                 {
@@ -200,20 +200,12 @@ namespace Ebay.Blazor.Data.ServiceUltil
 
         public async Task<Acknowledgement<TResult>> PutRequest<TResult, TModelRequest>(string url, TModelRequest requestModel, Action<Acknowledgement<TResult>> callback = null)
         {
-            // try
-            // {
-            //     var res = await _httpClient.PutAsJsonAsync(url, requestModel);
-            //     var response = await res.Content.ReadFromJsonAsync<TResult>();
-            // }
-            // catch (Exception)
-            // {
-            //     return "Thất bại";
-            // }
-            // return "Thành công";
-
             ActionCallRestFullApi callapi = async (string api) =>
             {
-                JsonContent content = JsonContent.Create(requestModel);
+                JsonContent content = JsonContent.Create(requestModel, null, new System.Text.Json.JsonSerializerOptions()
+                {
+                    PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+                });
                 var result = await _httpClient.PutAsync(api, content);
                 return result;
             };
