@@ -1,0 +1,37 @@
+@namespace Ebay.Blazor.Pages.Pages
+
+<Carousel @bind-SelectedSlide="@ImageSelectedState">
+    @foreach (var img in Images)
+    {
+        <CarouselSlide Name="@img.Value">
+            <Image Source="@img.Label" Text="Lights image" Display="Display.Block" Width="Width.Is100" />
+        </CarouselSlide>
+    }
+</Carousel>
+
+@code {
+    [Parameter]
+    public List<OptionItem<string>> Images { get; set; } = new List<OptionItem<string>>();
+
+    [Parameter]
+    public string _ImageSelect { get; set; }
+
+    private string? ImageSelectedState { get; set; } = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ImageSelectedState = _ImageSelect;
+        StateHasChanged();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_ImageSelect != ImageSelectedState)
+        {
+            ImageSelectedState = _ImageSelect;
+            StateHasChanged();
+        }
+    }
+
+
+}

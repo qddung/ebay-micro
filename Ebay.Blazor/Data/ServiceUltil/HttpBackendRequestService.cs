@@ -14,12 +14,13 @@ namespace Ebay.Blazor.Data.ServiceUltil
     public class HttpBackendRequestService
     {
         public HttpClient _httpClient;
-        // public INotificationService notificationService;
-        // public HttpBackendRequestService(HttpClient http, INotificationService notiService)
-        // {
-        //     _httpClient = http;
-        //     notificationService = notiService;
-        // }
+        public INotificationService _notificationService;
+        public HttpBackendRequestService(HttpClient http, INotificationService notiService)
+        {
+            _httpClient = http;
+            _httpClient.BaseAddress = new Uri("http://localhost:5059");
+            _notificationService = notiService;
+        }
 
         private Dictionary<int, string> _httpStatusMessage = new List<KeyValuePair<int, string>>()
         {
@@ -65,14 +66,6 @@ namespace Ebay.Blazor.Data.ServiceUltil
             new KeyValuePair<int, string>(504, "Gateway Timeout"),
             new KeyValuePair<int, string>(505, "HTTP Version Not Supporte")
         }.ToDictionary();
-
-        public HttpBackendRequestService(HttpClient http)
-        {
-
-            _httpClient = http;
-            _httpClient.BaseAddress = new Uri("http://localhost:5059");
-        }
-
         public delegate Task<HttpResponseMessage> ActionCallRestFullApi(string url);
 
         private async Task<Acknowledgement<T>> _CallApi<T>(string url, ActionCallRestFullApi call, Action<Acknowledgement<T>>? callback = null)
@@ -111,6 +104,11 @@ namespace Ebay.Blazor.Data.ServiceUltil
                 callback.Invoke(ack);
             }
             client.Dispose();
+
+            if (ack.IsSuccess == false)
+            {
+                _notificationService.Error(ack.Message);
+            }
             return ack;
 
         }
@@ -150,7 +148,7 @@ namespace Ebay.Blazor.Data.ServiceUltil
                 //    PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
                 //});
 
-                
+
 
                 using StringWriter requestWriter = new StringWriter();
                 var requestSerializer = GetSerialiser(null);

@@ -12,7 +12,7 @@ namespace Ebay.Model.Models
 
     public enum EOrderBy : int
     {
-        Desc = 0,
-        Asc = 1,
+        DescPrice = 0,
+        AscPrice = 1,
     }
 }

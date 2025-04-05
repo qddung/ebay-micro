@@ -3,12 +3,14 @@
 @inject EbayProductState ebayProdService
 <div class="container">
     <div class="search-container">
-        <Select @bind-SelectedValue="@ebayProdService.RequestModel.CategoryId" TValue="int?" Class="category-select">
+
+        <select @bind="@ebayProdService.RequestModel.CategoryId" class="category-select">
+
             @foreach (var o in ebayProdService.GetCategory())
             {
-                <SelectItem Value=@o.Value>@o.Label</SelectItem>
+                <option value="@o.Value">@o.Label</option>
             }
-        </Select>
+        </select>
 
         <input type="text" @bind="@ebayProdService.RequestModel.Keyword" class="search-input"
             placeholder="Search for anything">
@@ -19,11 +21,24 @@
 
 
 @code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ebayProdService.LoadDataModel();
+        await ebayProdService.GetData();
+    }
+
     public async Task SelectCategory(int? category)
     {
         ebayProdService.RequestModel.CategoryId = category;
         @* await InvokeAsync(() => StateHasChanged()); *@
         await ebayProdService.GetData();
+    }
+
+
+    public void Dispose()
+    {
+        ebayProdService.OnChange -= StateHasChanged;
     }
 
 

@@ -3,11 +3,16 @@
 @using Blazorise
 @using Blazorise.Bootstrap
 @using Blazorise.Icons
+@using Ebay.Model.Models
 
+
+@inject IJSRuntime JS
 @inject EbayProductState ebayProdService
 @inject INotificationService notiService
+@implements IDisposable
 
-<Container>
+
+<Container Class="d-flex flex-column vh-100">
     <Row>
         <Div Display="Display.Flex.Row.OnDesktop" Class="d-flex navigation-menu">
             <EbayLogo width="117" height="48" />
@@ -15,47 +20,134 @@
         </Div>
     </Row>
     <Row Class="mt-3 d-flex" Flex="Flex.JustifyContent.End">
-        <Select TValue="string" Placeholder="Best Match" Style="width:150px">
+        <Select TValue="EOrderBy" SelectedValue="@sortSelected" SelectedValueChanged="@OnSelectedValueSortChanged"
+            Placeholder="Best Match" Style="width:150px">
             @foreach (var option in sortOptions)
             {
-                <SelectItem Value="@option">@option</SelectItem>
+                <SelectItem Value="@option.Value">@option.Label</SelectItem>
             }
         </Select>
         <Div Width="Width.Auto">
-            <Button Color="Color.Primary">
-                <Blazorise.Icons.FontAwesome.Icon Name="Blazorise.Icons.FontAwesome.FontAwesomeIcons.List" />
-            </Button>
+
+            <Dropdown Display="Display.InlineBlock">
+                <DropdownToggle Color="Color.Primary">
+                    <Button Color="Color.Primary">
+                        <Blazorise.Icons.FontAwesome.Icon Name="@optionSelectedGrid?.Data" />
+                    </Button>
+                </DropdownToggle>
+                <DropdownMenu MaxMenuHeight="100px">
+                    @foreach (var item in GridTypes)
+                    {
+                        <DropdownItem @onclick="@(() => OnChangeLayout(item.Value))" Value="item.Value">
+                            <Blazorise.Icons.FontAwesome.Icon Name="item.Data" />
+                            @item.Label
+                        </DropdownItem>
+                    }
+                </DropdownMenu>
+            </Dropdown>
         </Div>
     </Row>
-    <Row Class="mt-4">
-        @foreach (var product in ebayProdService.GetProduct())
-        {
-            <Column Size="6">
-                <Card>
-                    <CardBody>
-                        <Row>
-                            <Column Size="4">
-                                @* <Image Src="@product.ImageUrl" Alt="Product Image" Fluid /> *@
-                            </Column>
-                            <Column Size="8">
-                                <h5>@product.ProductName</h5>
-                                <p><strong>@product.Price.ToString("N0") VND</strong></p>
-                                <p class="text-danger">@product.ViewCount watching</p>
-                            </Column>
-                        </Row>
-                    </CardBody>
-                </Card>
-            </Column>
-        }
-    </Row>
+    <div @ref="onScrollReference" class="mt-4 flex-item-1 scoll-element">
+        <Div Class="@($"flex-grid-container {optionSelectedGrid?.Label}")" Style="@("gap:10px; margin-bottom:10px")">
+            @foreach (var product in ebayProdService.GetProduct())
+            {
+                <Div Class="flex-grid-item">
+                    <Card>
+                        <CardBody>
+                            <Div Class="wrap-content">
+                                <Column Class="item-image">
+                                    <CarouselComponent Images="product.Images" _ImageSelect="@product.ImageView" />
+                                </Column>
+                                <Column Class="item-content">
+                                    <h5>@product.ProductName</h5>
+                                    <p><strong>@product.Price.ToString("N0") VND</strong></p>
+                                    <p class="text-danger">@product.ViewCount watching</p>
+                                </Column>
+                            </Div>
+                        </CardBody>
+                    </Card>
+                </Div>
+            }
+        </Div>
+    </div>
 </Container>
 
 @code {
+    private ElementReference onScrollReference;
+
     private List<string> categories = new() { "All Categories", "Watches", "Electronics", "Fashion" };
-    private List<string> sortOptions = new() { "Best Match", "Price: Low to High", "Price: High to Low" };
+    private List<OptionItem<EOrderBy>> sortOptions = new List<OptionItem<EOrderBy>>() {
+new OptionItem<EOrderBy>(){ Label ="Desc Price", Value= EOrderBy.DescPrice },
+new OptionItem<EOrderBy>(){ Label ="Asc Price", Value= EOrderBy.AscPrice },
+};
+
+
+    [JSInvokable]
+    public async Task LoadMoreProduct()
+    {
+        if (ebayProdService.ShouldLoadMore())
+        {
+            ebayProdService.LoadData();
+        }
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            selfReference = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("onThrottledScroll", onScrollReference, selfReference);
+        }
+    }
+
+
+    private EOrderBy sortSelected { get; set; } = EOrderBy.DescPrice;
+
+    public List<OptionData<int, string>> GridTypes { get; set; } =
+    new List<OptionData<int, string>>() {
+new OptionData<int, string>(){
+Label="card-type", Value= 0, Data =Blazorise.Icons.FontAwesome.FontAwesomeIcons.CartArrowDown
+},
+new OptionData<int, string>(){
+Label="list-type", Value= 1, Data = Blazorise.Icons.FontAwesome.FontAwesomeIcons.List
+},
+    };
+
+    public async Task OnSelectedValueSortChanged(EOrderBy value)
+    {
+        sortSelected = value;
+        await ebayProdService.GetData();
+    }
+
+
+    public int gridSelected { get; set; } = 0;
+
+    public OptionData<int, string> optionSelectedGrid
+    {
+        get
+        {
+
+            return GridTypes.FirstOrDefault(i => i.Value == gridSelected);
+        }
+    }
+
+    public void OnChangeLayout(int layoutValue)
+    {
+        gridSelected = layoutValue;
+        StateHasChanged();
+    }
+
     protected override async Task OnInitializedAsync()
     {
         ebayProdService.OnChange += StateHasChanged;
         await ebayProdService.GetData();
     }
+    private DotNetObjectReference<ProductPage>? selfReference;
+    public void Dispose()
+    {
+        selfReference.Dispose();
+        ebayProdService.OnChange -= StateHasChanged;
+    }
+
 }

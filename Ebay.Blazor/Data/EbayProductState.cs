@@ -18,7 +18,7 @@ public class EbayProductState
     {
         CategoryId = null,
         Keyword = null,
-        OrderBy = Model.Models.EOrderBy.Asc,
+        OrderBy = Model.Models.EOrderBy.AscPrice,
         PageRequest = new PagingRequest()
         {
             PageIndex = 1,
@@ -32,6 +32,15 @@ public class EbayProductState
         PageSize = 10,
     };
 
+    public bool ShouldLoadMore()
+    {
+        if (PagingData.PageIndex <= PagingData.TotalPage)
+        {
+            return true;
+        }
+        return false;
+    }
+
     private List<OptionItem<int?>> ListCategory { get; set; } = new List<OptionItem<int?>>();
 
     private List<ProductViewItem> Products { get; set; } = new List<ProductViewItem>();
@@ -44,26 +53,30 @@ public class EbayProductState
         _notificationService.Warning(notification);
     }
 
+    public async Task LoadDataModel()
+    {
+        var cateGory = await _client.GetRequest<List<OptionItem<int?>>>
+                                    ("/api/Category/GetCategoryOption");
+        if (cateGory.IsSuccess == false)
+        {
+            // ShowNotification(cateGory.Message);
+            return;
+        }
+        // Update Category
+        ListCategory = cateGory.Data;
+        NotifyStateChanged();
+    }
+
     public async Task GetData()
     {
         var pageModel = await _client.PostRequest<PagingData<ProductViewItem>, RequestProductList>
                             ("/api/Product/GetProductWithRequestModel", RequestModel);
-        var cateGory = await _client.GetRequest<List<OptionItem<int?>>>
-                            ("/api/Category/GetCategoryOption");
-        if(pageModel.IsSuccess == false){
-            ShowNotification(pageModel.Message);  
-            return; 
+
+        if (pageModel.IsSuccess == false)
+        {
+            ShowNotification(pageModel.Message);
+            return;
         }
-
-        if(cateGory.IsSuccess == false){
-            ShowNotification(cateGory.Message);   
-            return;  
-        }
-
-
-        // Update Category
-        ListCategory = cateGory.Data;
-
         // Update List Data
         var ack = pageModel;
         var data = ack.Data;
@@ -82,6 +95,37 @@ public class EbayProductState
         // State Change
         NotifyStateChanged();
     }
+
+
+    public async Task LoadData()
+    {
+        var pageModel = await _client.PostRequest<PagingData<ProductViewItem>, RequestProductList>
+                            ("/api/Product/GetProductWithRequestModel", RequestModel);
+
+        if (pageModel.IsSuccess == false)
+        {
+            ShowNotification(pageModel.Message);
+            return;
+        }
+        // Update List Data
+        var ack = pageModel;
+        var data = ack.Data;
+        var dataList = data.DataList;
+        Products = Products.Concat(dataList).ToList();
+
+        // Update Paging 
+        PagingData = new PagingData()
+        {
+            PageIndex = data.PageIndex,
+            PageSize = data.PageSize,
+            TotalItem = data.TotalItem,
+            TotalPage = data.TotalPage,
+        };
+
+        // State Change
+        NotifyStateChanged();
+    }
+
 
     public event Action? OnChange;
 

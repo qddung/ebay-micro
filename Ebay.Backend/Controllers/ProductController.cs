@@ -63,13 +63,13 @@ namespace Ebay.Backend.Controllers
             }
 
             var totalProduct = await queryProduct.CountAsync();
-            if (request.OrderBy == EOrderBy.Asc)
+            if (request.OrderBy == EOrderBy.AscPrice)
             {
-                queryProduct = queryProduct.OrderBy(i => i.CreatedAt);
+                queryProduct = queryProduct.OrderBy(i => i.Price);
             }
             else
             {
-                queryProduct = queryProduct.OrderBy(i => i.CreatedAt);
+                queryProduct = queryProduct.OrderByDescending(i => i.Price);
             }
 
             var pageSize = pagingResponse.PageSize.Value;
@@ -78,7 +78,10 @@ namespace Ebay.Backend.Controllers
             var productIds = lsProduct.Select(i => i.Id).ToList();
             // populate Image
             var prodImageQuery = await context.ProductImages.Where(i => productIds.Contains(i.ProductId)).ToListAsync();
-            var dictionaryProdImage = prodImageQuery.GroupBy(i => i.ProductId).ToDictionary(i => i.Key, j => j.ToList());
+            var dictionaryProdImage = prodImageQuery.GroupBy(i => i.ProductId)
+                        .ToDictionary(i => i.Key,
+                                    j => j.Select(k => new OptionItem<string>() { Label = k.ImageUrl, Value = k.Id.ToString() })
+                        .ToList());
 
 
             // populate View
@@ -97,11 +100,11 @@ namespace Ebay.Backend.Controllers
 
             var prodViews = lsProduct.Select(i =>
             {
-                var prodImgs = new List<string>();
+                var prodImgs = new List<OptionItem<string>>();
                 var view = 0;
                 if (dictionaryProdImage.ContainsKey(i.Id))
                 {
-                    prodImgs = dictionaryProdImage[i.Id].Select(i => i.ImageUrl).ToList();
+                    prodImgs = dictionaryProdImage[i.Id].ToList();
                 }
                 if (dictionaryProdView.ContainsKey(i.Id))
                 {
@@ -112,13 +115,12 @@ namespace Ebay.Backend.Controllers
                 {
                     ProductId = i.Id,
                     ProductName = i.Name,
+                    ImageView = prodImgs.FirstOrDefault()?.Value?.ToString(),
                     Images = prodImgs,
                     ViewCount = view,
                     Price = i.Price
                 };
             }).ToList();
-
-
 
             var result = new PagingData<ProductViewItem>()
             {
